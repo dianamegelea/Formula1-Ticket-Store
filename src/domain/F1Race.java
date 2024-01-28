@@ -1,8 +1,6 @@
 package domain;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class F1Race {
     private int raceNumber;
@@ -19,7 +17,7 @@ public class F1Race {
         this.location = location;
         this.date = date;
         this.maximumAttendance = maximumAttendance;
-        this.seats = new CopyOnWriteArrayList<>();
+        this.seats = new ArrayList<>();
     }
 
     public List<Seat> getSeats() {

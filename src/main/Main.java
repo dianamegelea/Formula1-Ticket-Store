@@ -48,15 +48,15 @@ public class Main {
         f1TicketStore.addCustomerAsync(RaduNichita);
         f1TicketStore.addCustomerAsync(CristiOlaru);
 
-        f1TicketStore.purchaseTicket(DianaMegelea, MonacoGP.get(), paddock);
-        f1TicketStore.purchaseTicket(RaduNichita, MonzaGP.get(), grandstand26A);
-        f1TicketStore.purchaseTicket(CristiOlaru, MonzaGP.get(), generalAdmission);
+        f1TicketStore.purchaseTicketAsync(DianaMegelea, MonacoGP.get(), paddock);
+        f1TicketStore.purchaseTicketAsync(RaduNichita, MonzaGP.get(), grandstand26A);
+        f1TicketStore.purchaseTicketAsync(CristiOlaru, MonzaGP.get(), generalAdmission);
 
         List<Item> items = addItems();
         items.forEach(f1MerchStore::addItemToStore);
 
         f1MerchStore.purchaseItemFromMerchStore(DianaMegelea, new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 1));
-
+        f1MerchStore.purchaseItemFromMerchStore(CristiOlaru, new Cap("Mercedes", "black", 2024, 1));
 
         StoreReport storeReport = new StoreReport(f1TicketStore);
         System.out.println(storeReport.getAllAvailableSeats());
@@ -64,6 +64,8 @@ public class Main {
         System.out.println(storeReport.getNumberOfSoldTicketsPerRace());
         System.out.println(storeReport.getPurchasedItems());
         System.out.println(storeReport.getAvailableItemsInStore());
+
+        F1TicketStore.threadPool.shutdown();
     }
 
     private static List<F1Race> createCalendar() {
@@ -101,7 +103,7 @@ public class Main {
         List<Item> items = new ArrayList<>();
 
         items.add(new Cap("Ferrari", "red", 2024, 10));
-        items.add(new Cap("Mercedes", "black", 2024, 10));
+        items.add(new Cap("Mercedes", "black", 2024, 1));
         items.add(new Cap("McLaren", "orange", 2024, 10));
         items.add(new Cap("RedBull", "dark blue", 2024, 10));
 

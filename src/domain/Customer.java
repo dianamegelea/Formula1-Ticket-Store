@@ -28,6 +28,10 @@ public class Customer {
         return purchasedMerch;
     }
 
+    public int getCustomerId() {
+        return customerId;
+    }
+
     public String getName() {
         return name;
     }
@@ -38,6 +42,7 @@ public class Customer {
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", purchasedTickets=" + purchasedTickets +
+                ", purchasedMerch=" + purchasedMerch +
                 '}';
     }
 }

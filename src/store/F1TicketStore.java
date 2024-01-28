@@ -7,17 +7,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class F1TicketStore {
     private List<F1Race> races;
-    private static List<Customer> customers;
+    private List<Customer> customers;
     private F1MerchStore merchStore;
 
     private static F1TicketStore instance;
     private final Object purchaseLock = new Object();
-    static final ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    public static final ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     private F1TicketStore() {
         races = new ArrayList<>();
@@ -56,13 +58,20 @@ public class F1TicketStore {
     }
 
     public void addCustomerAsync(Customer customer) {
-        threadPool.submit(() -> {
+        Future<?> future = threadPool.submit(() -> {
             try {
                 registerCustomer(customer);
             } catch (ClientExistsException e) {
                 e.printStackTrace();
             }
         });
+
+        try {
+            // Wait for the asynchronous task to complete
+            future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     private void registerCustomer(Customer newCustomer) throws ClientExistsException {
@@ -81,22 +90,24 @@ public class F1TicketStore {
         r.ifPresent(f1Race -> f1Race.getSeats().addAll(seats));
     }
 
-    public boolean purchaseTicketAsync(Customer customer, F1Race race, Seat seat) {
-        threadPool.submit(() -> purchaseTicket(customer, race, seat));
-        return true; // Assuming success (confirmation will be handled asynchronously)
+    public void purchaseTicketAsync(Customer customer, F1Race race, Seat seat) {
+        Future<?> future = threadPool.submit(() -> purchaseTicket(customer, race, seat));
+        try {
+            // Wait for the asynchronous task to complete
+            future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
-    public boolean purchaseTicket(Customer customer, F1Race race, Seat seat) {
+    private void purchaseTicket(Customer customer, F1Race race, Seat seat) {
         if (race.getSeats().contains(seat) && seat.isAvailable()) {
             synchronized (purchaseLock) {
                 Ticket ticket = new Ticket(race.getRaceName(), seat);
                 customer.getPurchasedTickets().add(ticket);
                 seat.setAvailable(false);
                 race.incrementSoldTickets();
-                return true;
             }
-        } else {
-            return false;
         }
     }
 }

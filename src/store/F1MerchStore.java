@@ -10,6 +10,9 @@ import exceptions.ItemNotAvailable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import static store.F1TicketStore.threadPool;
 
@@ -38,13 +41,20 @@ public class F1MerchStore {
     }
 
     public void purchaseItemFromMerchStore(Customer customer, Item item) {
-        threadPool.submit(() -> {
+        Future<?> future = threadPool.submit(() -> {
             try {
                 purchaseItem(customer, item);
             } catch (ItemNotAvailable e) {
                 throw new RuntimeException(e);
             }
         });
+
+        try {
+            // Wait for the asynchronous task to complete
+            future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     private void purchaseItem(Customer customer, Item item) throws ItemNotAvailable {

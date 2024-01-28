@@ -1,7 +1,6 @@
 package domain;
 
 import exceptions.ItemNotAvailable;
-import store.F1MerchStore;
 
 import java.util.Objects;
 
@@ -25,12 +24,10 @@ public abstract class Item {
         return quantity;
     }
 
-    public boolean decreaseQuantity(int q) {
+    public void decreaseQuantity(int q) {
         if (quantity >= q) {
             quantity -= q;
-            return true;
         }
-        return false;
     }
 
     @Override
@@ -48,8 +45,7 @@ public abstract class Item {
 
     @Override
     public String toString() {
-        return '{' +
-                "team=" + team +
+        return "team=" + team +
                 ", color=" + color +
                 ", season=" + season +
                 ", quantity=" + quantity;

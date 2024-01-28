@@ -24,6 +24,9 @@ public class Ticket {
         return raceName;
     }
 
+    public Seat getSeat() {
+        return seat;
+    }
 
     @Override
     public String toString() {
