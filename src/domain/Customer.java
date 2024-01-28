@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Customer {
-    private AtomicInteger customersCounter = new AtomicInteger(0);
+    private static AtomicInteger customersCounter = new AtomicInteger(0);
     private int customerId;
     private String name;
     private String email;
@@ -18,8 +18,12 @@ public class Customer {
         this.purchasedTickets = new ArrayList<>();
     }
 
-    public void purchaseTicket(Ticket ticket) {
-        this.purchasedTickets.add(ticket);
+    public List<Ticket> getPurchasedTickets() {
+        return purchasedTickets;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
