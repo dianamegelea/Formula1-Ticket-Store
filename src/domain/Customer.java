@@ -10,16 +10,22 @@ public class Customer {
     private String name;
     private String email;
     private List<Ticket> purchasedTickets;
+    private List<Item> purchasedMerch;
 
     public Customer(String name, String email) {
         this.customerId = customersCounter.getAndIncrement();
         this.name = name;
         this.email = email;
         this.purchasedTickets = new ArrayList<>();
+        this.purchasedMerch = new ArrayList<>();
     }
 
     public List<Ticket> getPurchasedTickets() {
         return purchasedTickets;
+    }
+
+    public List<Item> getPurchasedMerch() {
+        return purchasedMerch;
     }
 
     public String getName() {

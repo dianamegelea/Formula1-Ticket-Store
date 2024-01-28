@@ -12,11 +12,12 @@ import java.util.concurrent.Executors;
 
 public class F1TicketStore {
     private List<F1Race> races;
-    private List<Customer> customers;
+    private static List<Customer> customers;
+    private F1MerchStore merchStore;
 
     private static F1TicketStore instance;
     private final Object purchaseLock = new Object();
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    static final ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     private F1TicketStore() {
         races = new ArrayList<>();
@@ -36,6 +37,22 @@ public class F1TicketStore {
 
     public void setRaces(List<F1Race> races) {
         this.races = races;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
+    }
+
+    public F1MerchStore getMerchStore() {
+        return merchStore;
+    }
+
+    public void setMerchStore(F1MerchStore merchStore) {
+        this.merchStore = merchStore;
     }
 
     public void addCustomerAsync(Customer customer) {

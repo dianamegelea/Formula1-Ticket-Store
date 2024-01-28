@@ -1,6 +1,9 @@
+package main;
+
 import domain.*;
 import exceptions.RaceDoesNotExistException;
 import report.StoreReport;
+import store.F1MerchStore;
 import store.F1TicketStore;
 
 import java.util.*;
@@ -8,6 +11,8 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) throws RaceDoesNotExistException {
         F1TicketStore f1TicketStore = F1TicketStore.getInstance();
+        F1MerchStore f1MerchStore = F1MerchStore.getInstance();
+        f1TicketStore.setMerchStore(f1MerchStore);
 
         List<F1Race> races = createCalendar();
         f1TicketStore.setRaces(races);
@@ -36,14 +41,29 @@ public class Main {
         }
 
         Customer DianaMegelea = new Customer("Diana Megelea", "megeleadiana@gmail.com");
+        Customer RaduNichita = new Customer("Radu Nichita", "nichitaradu@gmail.com");
+        Customer CristiOlaru = new Customer("Cristian Olaru", "olarucristian@gmail.com");
+
         f1TicketStore.addCustomerAsync(DianaMegelea);
+        f1TicketStore.addCustomerAsync(RaduNichita);
+        f1TicketStore.addCustomerAsync(CristiOlaru);
 
         f1TicketStore.purchaseTicket(DianaMegelea, MonacoGP.get(), paddock);
+        f1TicketStore.purchaseTicket(RaduNichita, MonzaGP.get(), grandstand26A);
+        f1TicketStore.purchaseTicket(CristiOlaru, MonzaGP.get(), generalAdmission);
+
+        List<Item> items = addItems();
+        items.forEach(f1MerchStore::addItemToStore);
+
+        f1MerchStore.purchaseItemFromMerchStore(DianaMegelea, new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 1));
+
 
         StoreReport storeReport = new StoreReport(f1TicketStore);
         System.out.println(storeReport.getAllAvailableSeats());
-
-        System.out.println(DianaMegelea);
+        System.out.println(storeReport.getAllTicketsBought());
+        System.out.println(storeReport.getNumberOfSoldTicketsPerRace());
+        System.out.println(storeReport.getPurchasedItems());
+        System.out.println(storeReport.getAvailableItemsInStore());
     }
 
     private static List<F1Race> createCalendar() {
@@ -75,5 +95,25 @@ public class Main {
         races.add(new F1Race(24, "Abu Dhabi", "UAE", new Date(2024, Calendar.MAY, 20), 70000));
 
         return races;
+    }
+
+    private static List<Item> addItems() {
+        List<Item> items = new ArrayList<>();
+
+        items.add(new Cap("Ferrari", "red", 2024, 10));
+        items.add(new Cap("Mercedes", "black", 2024, 10));
+        items.add(new Cap("McLaren", "orange", 2024, 10));
+        items.add(new Cap("RedBull", "dark blue", 2024, 10));
+
+        items.add(new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 5));
+        items.add(new TShirt("Ferrari", "red", 2024, 40, "normal", "M", 2));
+        items.add(new TShirt("Mercedes", "black", 2024, 34, "fit", "F", 5));
+        items.add(new TShirt("Mercedes", "black", 2024, 38, "fit", "F", 3));
+        items.add(new TShirt("Mercedes", "black", 2024, 42, "fit", "M", 5));
+        items.add(new TShirt("McLaren", "orange", 2024, 36, "normal", "M", 5));
+        items.add(new TShirt("McLaren", "orange", 2024, 40, "normal", "M", 7));
+
+
+        return items;
     }
 }

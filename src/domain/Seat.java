@@ -69,17 +69,16 @@ public class Seat {
     public String toString() {
         if (category == Category.GRANDSTAND) {
             return "Seat{" +
-                    "row=" + row +
-                    ", seatNumber=" + seatNumber +
-                    ", available=" + available +
-                    ", price=" + price +
+                    "price=" + price +
                     ", category=" + category +
-                    ", grandstandName='" + grandstandName + '\'' +
+                    ", grandstandName=" + grandstandName +
+                    ", row=" + row +
+                    ", seatNumber=" + seatNumber +
                     '}';
         } else {
             return "Seat{" +
                     "price=" + price +
-                    ", category=" + category + '\'' +
+                    ", category=" + category +
                     '}';
         }
     }
