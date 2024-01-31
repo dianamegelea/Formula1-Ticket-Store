@@ -57,7 +57,7 @@ public class F1TicketStore {
         this.merchStore = merchStore;
     }
 
-    public void addCustomerAsync(Customer customer) {
+    public void addCustomer(Customer customer) {
         Future<?> future = threadPool.submit(() -> {
             try {
                 registerCustomer(customer);
@@ -67,7 +67,6 @@ public class F1TicketStore {
         });
 
         try {
-            // Wait for the asynchronous task to complete
             future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -93,7 +92,6 @@ public class F1TicketStore {
     public void purchaseTicketAsync(Customer customer, F1Race race, Seat seat) {
         Future<?> future = threadPool.submit(() -> purchaseTicket(customer, race, seat));
         try {
-            // Wait for the asynchronous task to complete
             future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

@@ -3,6 +3,7 @@ package report;
 import domain.*;
 import store.F1MerchStore;
 import store.F1TicketStore;
+import utils.Triple;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class StoreReport {
     public Map<String, List<Ticket>> getAllTicketsBought() {
         return ticketStore.getCustomers().stream()
                 .flatMap(customer -> customer.getPurchasedTickets().stream()
-                        .map(ticket -> new AbstractMap.SimpleEntry<>(customer.getName(), ticket)))
+                        .map(ticket -> Map.entry(customer.getName(), ticket)))
                 .collect(Collectors.groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, Collectors.toList())));
     }
 
@@ -52,10 +53,27 @@ public class StoreReport {
 
     public Map<String, List<Item>> getPurchasedItems() {
         return ticketStore.getCustomers().stream()
+                .filter(customer -> !customer.getPurchasedMerch().isEmpty())
                 .collect(Collectors.toMap(Customer::getName, Customer::getPurchasedMerch));
     }
 
     public List<Item> getAvailableItemsInStore() {
         return merchStore.getItems().stream().filter(item -> item.getQuantity() > 0).collect(toList());
+    }
+
+    public List<Triple<String, Integer, List<String>>> getRaceTicketInfoList() {
+        Map<String, List<String>> raceToCustomerNamesMap = ticketStore.getCustomers().stream()
+                .flatMap(customer -> customer.getPurchasedTickets().stream()
+                        .map(ticket -> Map.entry(ticket.getRaceName(), customer.getName())))
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+        return ticketStore.getRaces().stream()
+                .filter(race -> race.getSoldTickets() > 0)
+                .map(race -> new Triple<>(
+                        race.getRaceName(),
+                        race.getSoldTickets(),
+                        raceToCustomerNamesMap.getOrDefault(race.getRaceName(), List.of())
+                ))
+                .collect(Collectors.toList());
     }
 }

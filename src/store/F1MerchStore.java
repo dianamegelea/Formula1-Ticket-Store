@@ -50,7 +50,6 @@ public class F1MerchStore {
         });
 
         try {
-            // Wait for the asynchronous task to complete
             future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

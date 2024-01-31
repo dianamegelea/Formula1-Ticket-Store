@@ -5,6 +5,7 @@ import exceptions.RaceDoesNotExistException;
 import report.StoreReport;
 import store.F1MerchStore;
 import store.F1TicketStore;
+import utils.Triple;
 
 import java.util.*;
 
@@ -14,19 +15,18 @@ public class Main {
         F1MerchStore f1MerchStore = F1MerchStore.getInstance();
         f1TicketStore.setMerchStore(f1MerchStore);
 
-        List<F1Race> races = createCalendar();
-        f1TicketStore.setRaces(races);
+        F1Calendar f1Calendar = new F1Calendar();
+        f1TicketStore.setRaces(f1Calendar.getAllRaces());
 
-        F1Calendar f1Calendar = new F1Calendar(races);
-        Optional<F1Race> MonzaGP = f1Calendar.getRace("Monza");
-        Optional<F1Race> MonacoGP = f1Calendar.getRace("Monaco");
+        F1Race MonzaGP = f1Calendar.getRace("Monza");
+        F1Race MonacoGP = f1Calendar.getRace("Monaco");
 
         Seat generalAdmission = new Seat(Category.GENERAL_ADMISSION, 120);
         Seat grandstand26A = new Seat(Category.GRANDSTAND, "26A", 1, 1, 600);
         Seat grandstand1 = new Seat(Category.GRANDSTAND, "1", 1, 1, 800);
 
-        if (MonzaGP.isPresent()) {
-            f1TicketStore.addAvailableSeatsToRace(MonzaGP.get(), List.of(generalAdmission, grandstand1, grandstand26A));
+        if (MonzaGP != null) {
+            f1TicketStore.addAvailableSeatsToRace(MonzaGP, List.of(generalAdmission, grandstand1, grandstand26A));
         } else {
             throw new RaceDoesNotExistException();
         }
@@ -34,8 +34,8 @@ public class Main {
         Seat paddock = new Seat(Category.PADDOCK, 5000);
         Seat grandstandB = new Seat(Category.GRANDSTAND, "B", 1, 1, 1400);
 
-        if (MonacoGP.isPresent()) {
-            f1TicketStore.addAvailableSeatsToRace(MonacoGP.get(), List.of(paddock, grandstandB));
+        if (MonacoGP != null) {
+            f1TicketStore.addAvailableSeatsToRace(MonacoGP, List.of(paddock, grandstandB));
         } else {
             throw new RaceDoesNotExistException();
         }
@@ -44,13 +44,13 @@ public class Main {
         Customer RaduNichita = new Customer("Radu Nichita", "nichitaradu@gmail.com");
         Customer CristiOlaru = new Customer("Cristian Olaru", "olarucristian@gmail.com");
 
-        f1TicketStore.addCustomerAsync(DianaMegelea);
-        f1TicketStore.addCustomerAsync(RaduNichita);
-        f1TicketStore.addCustomerAsync(CristiOlaru);
+        f1TicketStore.addCustomer(DianaMegelea);
+        f1TicketStore.addCustomer(RaduNichita);
+        f1TicketStore.addCustomer(CristiOlaru);
 
-        f1TicketStore.purchaseTicketAsync(DianaMegelea, MonacoGP.get(), paddock);
-        f1TicketStore.purchaseTicketAsync(RaduNichita, MonzaGP.get(), grandstand26A);
-        f1TicketStore.purchaseTicketAsync(CristiOlaru, MonzaGP.get(), generalAdmission);
+        f1TicketStore.purchaseTicketAsync(DianaMegelea, MonacoGP, paddock);
+        f1TicketStore.purchaseTicketAsync(RaduNichita, MonzaGP, grandstand26A);
+        f1TicketStore.purchaseTicketAsync(CristiOlaru, MonzaGP, generalAdmission);
 
         List<Item> items = addItems();
         items.forEach(f1MerchStore::addItemToStore);
@@ -59,44 +59,55 @@ public class Main {
         f1MerchStore.purchaseItemFromMerchStore(CristiOlaru, new Cap("Mercedes", "black", 2024, 1));
 
         StoreReport storeReport = new StoreReport(f1TicketStore);
-        System.out.println(storeReport.getAllAvailableSeats());
-        System.out.println(storeReport.getAllTicketsBought());
-        System.out.println(storeReport.getNumberOfSoldTicketsPerRace());
-        System.out.println(storeReport.getPurchasedItems());
-        System.out.println(storeReport.getAvailableItemsInStore());
+
+        System.out.println("The seats available right now: ");
+        storeReport.getAllAvailableSeats().forEach((name, seats) -> {
+            System.out.println("\tRace: " + name);
+            System.out.print("\t\tAvailable seats:");
+
+            seats.forEach(value -> System.out.print("  " + value));
+            System.out.println();
+        });
+        System.out.println();
+        System.out.println("Tickets bought: ");
+        storeReport.getAllTicketsBought().forEach((name, tickets) -> {
+            System.out.println("\tCustomer: " + name);
+            System.out.print("\t\tTickets:");
+
+            tickets.forEach(value -> System.out.print("  " + value));
+            System.out.println();
+        });
+        System.out.println();
+        System.out.println("Number of tickets sold: " + storeReport.getNumberOfSoldTicketsPerRace());
+        System.out.println();
+        System.out.println("Items purchased from the merch store:");
+        storeReport.getPurchasedItems().forEach((name, itemsBought) -> {
+            System.out.println("\tCustomer: " + name);
+            System.out.print("\t\tItems:");
+
+            itemsBought.forEach(value -> System.out.print("  " + value));
+            System.out.println();
+        });
+        System.out.println();
+        System.out.println("Available items in store: ");
+        storeReport.getAvailableItemsInStore().forEach(item -> System.out.println("\t" + item));
+        System.out.println();
+        System.out.println("Overall race report:");
+        List<Triple<String, Integer, List<String>>> raceInfoList = storeReport.getRaceTicketInfoList();
+        for (Triple<String, Integer, List<String>> triple : raceInfoList) {
+            System.out.println("\tRace: " + triple.getFirst());
+            System.out.println("\t\tSold Tickets: " + triple.getSecond());
+            System.out.print("\t\tCustomers: ");
+
+            List<String> customers = triple.getThird();
+            for (String customer : customers) {
+                System.out.print(customer + ", ");
+            }
+            System.out.println();
+        }
+
 
         F1TicketStore.threadPool.shutdown();
-    }
-
-    private static List<F1Race> createCalendar() {
-        List<F1Race> races = new ArrayList<>();
-
-        races.add(new F1Race(1, "Bahrain", "Bahrain", new Date(2024, Calendar.MARCH, 2), 50000));
-        races.add(new F1Race(2, "Jeddah", "Saudi Arabia", new Date(2024, Calendar.MARCH, 9), 70000));
-        races.add(new F1Race(3, "Australia", "Australia", new Date(2024, Calendar.MARCH, 24), 90000));
-        races.add(new F1Race(4, "Suzuka", "Japan", new Date(2024, Calendar.APRIL, 7), 100000));
-        races.add(new F1Race(5, "China", "China", new Date(2024, Calendar.APRIL, 21), 70000));
-        races.add(new F1Race(6, "Miami", "USA", new Date(2024, Calendar.MAY, 5), 70000));
-        races.add(new F1Race(7, "Imola", "Italy", new Date(2024, Calendar.MAY, 19), 90000));
-        races.add(new F1Race(8, "Monaco", "Monaco", new Date(2024, Calendar.MAY, 26), 60000));
-        races.add(new F1Race(9, "Canada", "Canada", new Date(2024, Calendar.JUNE, 9), 75000));
-        races.add(new F1Race(10, "Spain", "Spain", new Date(2024, Calendar.JUNE, 23), 80000));
-        races.add(new F1Race(11, "Austria", "Austria", new Date(2024, Calendar.JUNE, 30), 70000));
-        races.add(new F1Race(12, "Silverstone", "UK", new Date(2024, Calendar.JULY, 7), 90000));
-        races.add(new F1Race(13, "Hungary", "Hungary", new Date(2024, Calendar.JULY, 21), 80000));
-        races.add(new F1Race(14, "Spa", "Belgium", new Date(2024, Calendar.JULY, 28), 100000));
-        races.add(new F1Race(15, "Zandvoort", "Netherlands", new Date(2024, Calendar.AUGUST, 25), 70000));
-        races.add(new F1Race(16, "Monza", "Italy", new Date(2024, Calendar.SEPTEMBER, 1), 100000));
-        races.add(new F1Race(17, "Baku", "Azerbaijan", new Date(2024, Calendar.SEPTEMBER, 15), 80000));
-        races.add(new F1Race(18, "Singapore", "Singapore", new Date(2024, Calendar.SEPTEMBER, 22), 70000));
-        races.add(new F1Race(19, "Austin", "USA", new Date(2024, Calendar.OCTOBER, 20), 90000));
-        races.add(new F1Race(20, "Mexico", "Mexico", new Date(2024, Calendar.OCTOBER, 27), 80000));
-        races.add(new F1Race(21, "Brazil", "Brazil", new Date(2024, Calendar.NOVEMBER, 3), 80000));
-        races.add(new F1Race(22, "Las Vegas", "USA", new Date(2024, Calendar.NOVEMBER, 23), 70000));
-        races.add(new F1Race(23, "Qatar", "Qatar", new Date(2024, Calendar.DECEMBER, 1), 70000));
-        races.add(new F1Race(24, "Abu Dhabi", "UAE", new Date(2024, Calendar.MAY, 20), 70000));
-
-        return races;
     }
 
     private static List<Item> addItems() {

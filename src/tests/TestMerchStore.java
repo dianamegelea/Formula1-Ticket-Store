@@ -31,7 +31,7 @@ public class TestMerchStore {
         merchStore.addItemToStore(cap);
 
         Customer Tiberiu = new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com");
-        ticketStore.addCustomerAsync(Tiberiu);
+        ticketStore.addCustomer(Tiberiu);
 
         merchStore.purchaseItemFromMerchStore(Tiberiu, cap);
 

@@ -29,8 +29,8 @@ public class TestTicketStore {
         F1TicketStore ticketStore = F1TicketStore.getInstance();
         ticketStore.addRaceToCalendar(new F1Race(1, "Bahrain", "Bahrain", new Date(2024, Calendar.MARCH, 2), 50000));
 
-        ticketStore.addCustomerAsync(new Customer("Diana Megelea", "megeleadiana@gmail.com"));
-        ticketStore.addCustomerAsync(new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com"));
+        ticketStore.addCustomer(new Customer("Diana Megelea", "megeleadiana@gmail.com"));
+        ticketStore.addCustomer(new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com"));
 
         assertEquals(2, ticketStore.getCustomers().size());
 
@@ -68,7 +68,7 @@ public class TestTicketStore {
         ticketStore.addAvailableSeatsToRace(Bahrain, List.of(generalAdmission, paddock));
 
         Customer Tiberiu = new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com");
-        ticketStore.addCustomerAsync(Tiberiu);
+        ticketStore.addCustomer(Tiberiu);
 
         ticketStore.purchaseTicketAsync(Tiberiu, Bahrain, paddock);
 

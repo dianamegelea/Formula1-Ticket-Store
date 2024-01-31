@@ -28,10 +28,6 @@ public class F1Race {
         return raceName;
     }
 
-    public int getMaximumAttendance() {
-        return maximumAttendance;
-    }
-
     public int getSoldTickets() {
         return soldTickets;
     }
