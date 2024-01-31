@@ -30,7 +30,8 @@ public class TestMerchStore {
         Item cap = new Cap("Ferrari", "red", 2024, 1);
         merchStore.addItemToStore(cap);
 
-        Customer Tiberiu = new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com");
+        Customer Tiberiu = new Customer("Tiberiu Megelea",
+                "megeleatiberiu@gmail.com");
         ticketStore.addCustomer(Tiberiu);
 
         merchStore.purchaseItemFromMerchStore(Tiberiu, cap);

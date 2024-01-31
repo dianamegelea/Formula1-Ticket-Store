@@ -18,16 +18,19 @@ public abstract class Item {
         this.quantity = quantity;
     }
 
-    public abstract void accept(ItemVisitor visitor, Customer customer, Item existingItem) throws ItemNotAvailable;
+    public abstract void accept(ItemVisitor visitor, Customer customer,
+                                Item existingItem) throws ItemNotAvailable;
 
     public int getQuantity() {
         return quantity;
     }
 
-    public void decreaseQuantity(int q) {
+    public boolean decreaseQuantity(int q) {
         if (quantity >= q) {
             quantity -= q;
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -35,7 +38,8 @@ public abstract class Item {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return season == item.season && Objects.equals(team, item.team) && Objects.equals(color, item.color);
+        return season == item.season && Objects.equals(team, item.team)
+                && Objects.equals(color, item.color);
     }
 
     @Override

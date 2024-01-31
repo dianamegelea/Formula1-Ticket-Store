@@ -16,7 +16,8 @@ public class Seat {
         this.category = category;
     }
 
-    public Seat(Category category, String grandstandName, int row, int seatNumber, double price) {
+    public Seat(Category category, String grandstandName, int row,
+                int seatNumber, double price) {
         this.row = row;
         this.seatNumber = seatNumber;
         this.available = true;

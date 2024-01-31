@@ -56,20 +56,19 @@ public class F1MerchStore {
         }
     }
 
-    private void purchaseItem(Customer customer, Item item) throws ItemNotAvailable {
-        Optional<Item> it = items.stream().filter(item1 -> item1.equals(item)).findFirst();
+    private void purchaseItem(Customer customer, Item item)
+            throws ItemNotAvailable {
+        Optional<Item> it = items.stream()
+                .filter(item1 -> item1.equals(item)).findFirst();
         if (it.isPresent()) {
             synchronized (purchaseLock) {
                 Item existingItem = it.get();
-                if (existingItem.getQuantity() >= item.getQuantity()) {
-                    ItemVisitor visitor = new ItemPurchaseVisitor();
-                    item.accept(visitor, customer, existingItem);
-                } else {
-                    throw new ItemNotAvailable("Not enough items in stock to match the requested quantity.");
-                }
+
+                ItemVisitor visitor = new ItemPurchaseVisitor();
+                item.accept(visitor, customer, existingItem);
             }
         } else {
-            throw new ItemNotAvailable("We don't have that item in our store.");
+            throw new ItemNotAvailable("We don't have that item in our store");
         }
     }
 

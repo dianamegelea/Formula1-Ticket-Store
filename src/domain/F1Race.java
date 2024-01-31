@@ -11,7 +11,8 @@ public class F1Race {
     private int soldTickets;
     private List<Seat> seats;
 
-    public F1Race(int raceNumber, String raceName, String location, Date date, int maximumAttendance) {
+    public F1Race(int raceNumber, String raceName, String location, Date date,
+                  int maximumAttendance) {
         this.raceNumber = raceNumber;
         this.raceName = raceName;
         this.location = location;

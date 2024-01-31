@@ -8,7 +8,8 @@ public class Cap extends Item {
     }
 
     @Override
-    public void accept(ItemVisitor visitor, Customer customer, Item existingItem) throws ItemNotAvailable {
+    public void accept(ItemVisitor visitor, Customer customer,
+                       Item existingItem) throws ItemNotAvailable {
         visitor.visit(this, customer, existingItem);
     }
 

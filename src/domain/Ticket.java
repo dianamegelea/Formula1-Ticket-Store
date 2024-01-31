@@ -1,11 +1,9 @@
 package domain;
 
-import utils.Pair;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Ticket {
-    private static AtomicInteger ticketsCounter = new AtomicInteger(0);
+    private static final AtomicInteger ticketsCounter = new AtomicInteger(0);
     private int ticketId;
     private String raceName;
     private Seat seat;

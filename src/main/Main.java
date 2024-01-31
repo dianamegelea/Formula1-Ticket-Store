@@ -48,9 +48,9 @@ public class Main {
         f1TicketStore.addCustomer(RaduNichita);
         f1TicketStore.addCustomer(CristiOlaru);
 
-        f1TicketStore.purchaseTicketAsync(DianaMegelea, MonacoGP, paddock);
-        f1TicketStore.purchaseTicketAsync(RaduNichita, MonzaGP, grandstand26A);
-        f1TicketStore.purchaseTicketAsync(CristiOlaru, MonzaGP, generalAdmission);
+        f1TicketStore.purchaseTicket(DianaMegelea, MonacoGP, paddock);
+        f1TicketStore.purchaseTicket(RaduNichita, MonzaGP, grandstand26A);
+        f1TicketStore.purchaseTicket(CristiOlaru, MonzaGP, generalAdmission);
 
         List<Item> items = addItems();
         items.forEach(f1MerchStore::addItemToStore);
@@ -78,7 +78,7 @@ public class Main {
             System.out.println();
         });
         System.out.println();
-        System.out.println("Number of tickets sold: " + storeReport.getNumberOfSoldTicketsPerRace());
+        System.out.println("Number of tickets sold per race: " + storeReport.getNumberOfSoldTicketsPerRace());
         System.out.println();
         System.out.println("Items purchased from the merch store:");
         storeReport.getPurchasedItems().forEach((name, itemsBought) -> {

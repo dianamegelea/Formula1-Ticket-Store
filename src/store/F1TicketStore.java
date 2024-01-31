@@ -4,7 +4,6 @@ import domain.*;
 import exceptions.ClientExistsException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -19,11 +18,12 @@ public class F1TicketStore {
 
     private static F1TicketStore instance;
     private final Object purchaseLock = new Object();
-    public static final ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    public static final ExecutorService threadPool =
+            Executors.newFixedThreadPool(8);
 
     private F1TicketStore() {
         races = new ArrayList<>();
-        customers = Collections.synchronizedList(new ArrayList<>());
+        customers = new ArrayList<>();
     }
 
     public static synchronized F1TicketStore getInstance() {
@@ -73,7 +73,8 @@ public class F1TicketStore {
         }
     }
 
-    private void registerCustomer(Customer newCustomer) throws ClientExistsException {
+    private void registerCustomer(Customer newCustomer)
+            throws ClientExistsException {
         if (customers.contains(newCustomer)) {
             throw new ClientExistsException(newCustomer.getName());
         }
@@ -85,12 +86,14 @@ public class F1TicketStore {
     }
 
     public void addAvailableSeatsToRace(F1Race race, List<Seat> seats) {
-        Optional<F1Race> r = races.stream().filter(f1race -> f1race.equals(race)).findFirst();
+        Optional<F1Race> r = races.stream()
+                .filter(f1race -> f1race.equals(race)).findFirst();
         r.ifPresent(f1Race -> f1Race.getSeats().addAll(seats));
     }
 
-    public void purchaseTicketAsync(Customer customer, F1Race race, Seat seat) {
-        Future<?> future = threadPool.submit(() -> purchaseTicket(customer, race, seat));
+    public void purchaseTicket(Customer customer, F1Race race, Seat seat) {
+        Future<?> future = threadPool.submit(() ->
+                buyTicket(customer, race, seat));
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -98,7 +101,7 @@ public class F1TicketStore {
         }
     }
 
-    private void purchaseTicket(Customer customer, F1Race race, Seat seat) {
+    private void buyTicket(Customer customer, F1Race race, Seat seat) {
         if (race.getSeats().contains(seat) && seat.isAvailable()) {
             synchronized (purchaseLock) {
                 Ticket ticket = new Ticket(race.getRaceName(), seat);

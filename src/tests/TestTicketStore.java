@@ -17,7 +17,8 @@ public class TestTicketStore {
     @Test
     public void testAddRace() {
         F1TicketStore ticketStore = F1TicketStore.getInstance();
-        ticketStore.addRaceToCalendar(new F1Race(1, "Bahrain", "Bahrain", new Date(2024, Calendar.MARCH, 2), 50000));
+        ticketStore.addRaceToCalendar(new F1Race(1, "Bahrain", "Bahrain",
+                new Date(2024, Calendar.MARCH, 2), 50000));
 
         assertEquals(1, ticketStore.getRaces().size());
 
@@ -27,24 +28,30 @@ public class TestTicketStore {
     @Test
     public void testAddCustomer() {
         F1TicketStore ticketStore = F1TicketStore.getInstance();
-        ticketStore.addRaceToCalendar(new F1Race(1, "Bahrain", "Bahrain", new Date(2024, Calendar.MARCH, 2), 50000));
+        ticketStore.addRaceToCalendar(new F1Race(1, "Bahrain", "Bahrain",
+                new Date(2024, Calendar.MARCH, 2), 50000));
 
-        ticketStore.addCustomer(new Customer("Diana Megelea", "megeleadiana@gmail.com"));
-        ticketStore.addCustomer(new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com"));
+        ticketStore.addCustomer(new Customer("Diana Megelea",
+                "megeleadiana@gmail.com"));
+        ticketStore.addCustomer(new Customer("Tiberiu Megelea",
+                "megeleatiberiu@gmail.com"));
 
         assertEquals(2, ticketStore.getCustomers().size());
 
         assertEquals(0, ticketStore.getCustomers().get(0).getCustomerId());
         assertEquals(1, ticketStore.getCustomers().get(1).getCustomerId());
-        assertEquals("Diana Megelea", ticketStore.getCustomers().get(0).getName());
-        assertEquals("Tiberiu Megelea", ticketStore.getCustomers().get(1).getName());
+        assertEquals("Diana Megelea",
+                ticketStore.getCustomers().get(0).getName());
+        assertEquals("Tiberiu Megelea",
+                ticketStore.getCustomers().get(1).getName());
     }
 
     @Test
     public void testAddSeats() {
         F1TicketStore ticketStore = F1TicketStore.getInstance();
 
-        F1Race Bahrain = new F1Race(1, "Bahrain", "Bahrain", new Date(2024, Calendar.MARCH, 2), 50000);
+        F1Race Bahrain = new F1Race(1, "Bahrain", "Bahrain",
+                new Date(2024, Calendar.MARCH, 2), 50000);
         ticketStore.addRaceToCalendar(Bahrain);
 
         Seat generalAdmission = new Seat(Category.GENERAL_ADMISSION, 120);
@@ -59,21 +66,26 @@ public class TestTicketStore {
     public void testPurchaseTicket() {
         F1TicketStore ticketStore = F1TicketStore.getInstance();
 
-        F1Race Bahrain = new F1Race(1, "Bahrain", "Bahrain", new Date(2024, Calendar.MARCH, 2), 50000);
+        F1Race Bahrain = new F1Race(1, "Bahrain", "Bahrain",
+                new Date(2024, Calendar.MARCH, 2), 50000);
         ticketStore.addRaceToCalendar(Bahrain);
 
         Seat generalAdmission = new Seat(Category.GENERAL_ADMISSION, 120);
         Seat paddock = new Seat(Category.PADDOCK, 3000);
 
-        ticketStore.addAvailableSeatsToRace(Bahrain, List.of(generalAdmission, paddock));
+        ticketStore.addAvailableSeatsToRace(Bahrain,
+                List.of(generalAdmission, paddock));
 
-        Customer Tiberiu = new Customer("Tiberiu Megelea", "megeleatiberiu@gmail.com");
+        Customer Tiberiu = new Customer("Tiberiu Megelea",
+                "megeleatiberiu@gmail.com");
         ticketStore.addCustomer(Tiberiu);
 
-        ticketStore.purchaseTicketAsync(Tiberiu, Bahrain, paddock);
+        ticketStore.purchaseTicket(Tiberiu, Bahrain, paddock);
 
         assertEquals(1, Tiberiu.getPurchasedTickets().size());
-        assertEquals("Bahrain", Tiberiu.getPurchasedTickets().get(0).getRaceName());
-        assertEquals(Category.PADDOCK, Tiberiu.getPurchasedTickets().get(0).getSeat().getCategory());
+        assertEquals("Bahrain",
+                Tiberiu.getPurchasedTickets().get(0).getRaceName());
+        assertEquals(Category.PADDOCK,
+                Tiberiu.getPurchasedTickets().get(0).getSeat().getCategory());
     }
 }

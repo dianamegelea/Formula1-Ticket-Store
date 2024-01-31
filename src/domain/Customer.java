@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Customer {
-    private static AtomicInteger customersCounter = new AtomicInteger(0);
+    private static final AtomicInteger customersCounter = new AtomicInteger(0);
     private int customerId;
     private String name;
     private String email;

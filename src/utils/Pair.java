@@ -23,8 +23,8 @@ public class Pair<K, V> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equals(key, pair.key) && Objects.equals(value, pair.value);
+        Pair<?, ?> p = (Pair<?, ?>) o;
+        return Objects.equals(key, p.key) && Objects.equals(value, p.value);
     }
 
     @Override
