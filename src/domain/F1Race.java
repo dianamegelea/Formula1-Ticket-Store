@@ -1,6 +1,7 @@
 package domain;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class F1Race {
     private int raceNumber;
@@ -8,7 +9,7 @@ public class F1Race {
     private String location;
     private Date date;
     private int maximumAttendance;
-    private int soldTickets;
+    private AtomicInteger soldTickets;
     private List<Seat> seats;
 
     public F1Race(int raceNumber, String raceName, String location, Date date,
@@ -19,6 +20,7 @@ public class F1Race {
         this.date = date;
         this.maximumAttendance = maximumAttendance;
         this.seats = new ArrayList<>();
+        this.soldTickets = new AtomicInteger(0);
     }
 
     public List<Seat> getSeats() {
@@ -30,11 +32,11 @@ public class F1Race {
     }
 
     public int getSoldTickets() {
-        return soldTickets;
+        return soldTickets.get();
     }
 
     public void incrementSoldTickets() {
-        this.soldTickets++;
+        soldTickets.incrementAndGet();
     }
 
     @Override

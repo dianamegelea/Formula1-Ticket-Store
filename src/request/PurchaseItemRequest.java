@@ -22,10 +22,9 @@ public class PurchaseItemRequest implements Runnable {
         Optional<Item> it = items.stream()
                 .filter(item1 -> item1.equals(item)).findFirst();
         if (it.isPresent()) {
+            Item existingItem = it.get();
+            ItemVisitor visitor = new ItemPurchaseVisitor();
             synchronized (this) {
-                Item existingItem = it.get();
-
-                ItemVisitor visitor = new ItemPurchaseVisitor();
                 try {
                     item.accept(visitor, customer, existingItem);
                 } catch (ItemNotAvailable e) {

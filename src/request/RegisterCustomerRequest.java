@@ -1,6 +1,7 @@
 package request;
 
 import domain.Customer;
+import exceptions.ClientExistsException;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public class RegisterCustomerRequest implements Runnable {
 
     @Override
     public void run() {
-        customers.add(customer);
+        if (!customers.contains(customer)) {
+            customers.add(customer);
+        }
     }
 }

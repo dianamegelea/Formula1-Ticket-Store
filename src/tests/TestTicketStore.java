@@ -1,6 +1,7 @@
 package tests;
 
 import domain.*;
+import exceptions.ClientExistsException;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -17,6 +18,15 @@ import static org.junit.Assert.assertEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTicketStore {
+    @Test
+    public void test0AddAllRaces() {
+        F1TicketStore ticketStore = new F1TicketStore();
+        F1Calendar calendar = new F1Calendar();
+
+        calendar.getAllRaces().forEach(ticketStore::addRaceToCalendar);
+
+        assertEquals(24, ticketStore.getRaces().size());
+    }
     @Test
     public void test1AddRace() {
         F1TicketStore ticketStore = new F1TicketStore();

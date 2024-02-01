@@ -3,6 +3,7 @@ package tests;
 import domain.Cap;
 import domain.Customer;
 import domain.Item;
+import domain.TShirt;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -11,6 +12,7 @@ import store.F1MerchStore;
 import store.F1TicketStore;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -67,5 +69,34 @@ public class TestMerchStore {
 
         assertEquals(1, list.size());
         assertEquals(4, list.get(0).getQuantity());
+    }
+
+    @Test
+    public void test4GetPurchasedItems() {
+        F1TicketStore ticketStore = new F1TicketStore();
+        F1MerchStore merchStore = new F1MerchStore(ticketStore.getThreadPool());
+        ticketStore.setMerchStore(merchStore);
+
+        Item cap = new Cap("Ferrari", "red", 2023, 5);
+        merchStore.addItemToStore(cap);
+        Item shirt = new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 1);
+        merchStore.addItemToStore(shirt);
+
+        Customer Tiberiu = new Customer("Tiberiu Megelea",
+                "megeleatiberiu@gmail.com");
+        Customer Diana = new Customer("Diana Megelea",
+                "megeleadiana@gmail.com");
+        ticketStore.addCustomer(Diana);
+        ticketStore.addCustomer(Tiberiu);
+
+        Item cap1 = new Cap("Ferrari", "red", 2023, 1);
+        merchStore.purchaseItemFromMerchStore(Tiberiu, cap1);
+        merchStore.purchaseItemFromMerchStore(Diana, shirt);
+
+        StoreReport storeReport = new StoreReport(ticketStore);
+        Map<String, List<Item>> map = storeReport.getPurchasedItems();
+
+        assertEquals(2, map.size());
+        assertEquals(1, map.get("Tiberiu Megelea").size());
     }
 }
