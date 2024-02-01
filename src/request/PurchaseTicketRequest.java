@@ -18,11 +18,13 @@ public class PurchaseTicketRequest implements Runnable {
 
     @Override
     public void run() {
-        if (race.getSeats().contains(seat) && seat.isAvailable()) {
+        if (race.getSeats().contains(seat)) {
             Ticket ticket = new Ticket(race.getRaceName(), seat);
             synchronized (this) {
-                customer.getPurchasedTickets().add(ticket);
-                seat.setAvailable(false);
+                if (seat.isAvailable()) {
+                    seat.setAvailable(false);
+                    customer.getPurchasedTickets().add(ticket);
+                }
             }
             race.incrementSoldTickets();
         }
