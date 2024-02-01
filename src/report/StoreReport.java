@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StoreReport {
-    private final F1TicketStore ticketStore;
-    private final F1MerchStore merchStore;
+    private F1TicketStore ticketStore;
+    private F1MerchStore merchStore;
 
     public StoreReport(F1TicketStore ticketStore) {
         this.ticketStore = ticketStore;

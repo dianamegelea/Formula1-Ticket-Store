@@ -11,8 +11,8 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws RaceDoesNotExistException {
-        F1TicketStore f1TicketStore = F1TicketStore.getInstance();
-        F1MerchStore f1MerchStore = F1MerchStore.getInstance();
+        F1TicketStore f1TicketStore = new F1TicketStore();
+        F1MerchStore f1MerchStore = new F1MerchStore(f1TicketStore.getThreadPool());
         f1TicketStore.setMerchStore(f1MerchStore);
 
         F1Calendar f1Calendar = new F1Calendar();
@@ -20,11 +20,11 @@ public class Main {
 
         F1Race MonzaGP = f1Calendar.getRace("Monza");
         F1Race MonacoGP = f1Calendar.getRace("Monaco");
+        F1Race MiamiGP = f1Calendar.getRace("Miami");
 
         Seat generalAdmission = new Seat(Category.GENERAL_ADMISSION, 120);
         Seat grandstand26A = new Seat(Category.GRANDSTAND, "26A", 1, 1, 600);
         Seat grandstand1 = new Seat(Category.GRANDSTAND, "1", 1, 1, 800);
-
         if (MonzaGP != null) {
             f1TicketStore.addAvailableSeatsToRace(MonzaGP, List.of(generalAdmission, grandstand1, grandstand26A));
         } else {
@@ -33,9 +33,16 @@ public class Main {
 
         Seat paddock = new Seat(Category.PADDOCK, 5000);
         Seat grandstandB = new Seat(Category.GRANDSTAND, "B", 1, 1, 1400);
-
         if (MonacoGP != null) {
             f1TicketStore.addAvailableSeatsToRace(MonacoGP, List.of(paddock, grandstandB));
+        } else {
+            throw new RaceDoesNotExistException();
+        }
+
+        Seat paddockVIP = new Seat(Category.PADDOCK, 10000);
+        Seat grandstandMain = new Seat(Category.GRANDSTAND, "Main", 1, 1, 1800);
+        if (MiamiGP != null) {
+            f1TicketStore.addAvailableSeatsToRace(MiamiGP, List.of(paddockVIP, grandstandMain));
         } else {
             throw new RaceDoesNotExistException();
         }
@@ -43,16 +50,28 @@ public class Main {
         Customer DianaMegelea = new Customer("Diana Megelea", "megeleadiana@gmail.com");
         Customer RaduNichita = new Customer("Radu Nichita", "nichitaradu@gmail.com");
         Customer CristiOlaru = new Customer("Cristian Olaru", "olarucristian@gmail.com");
-
         f1TicketStore.addCustomer(DianaMegelea);
         f1TicketStore.addCustomer(RaduNichita);
         f1TicketStore.addCustomer(CristiOlaru);
 
         f1TicketStore.purchaseTicket(DianaMegelea, MonacoGP, paddock);
+        f1TicketStore.purchaseTicket(DianaMegelea, MiamiGP, paddockVIP);
         f1TicketStore.purchaseTicket(RaduNichita, MonzaGP, grandstand26A);
         f1TicketStore.purchaseTicket(CristiOlaru, MonzaGP, generalAdmission);
 
-        List<Item> items = addItems();
+        List<Item> items = new ArrayList<>(Arrays.asList(
+                new Cap("Ferrari", "red", 2024, 10),
+                new Cap("Mercedes", "black", 2024, 1),
+                new Cap("McLaren", "orange", 2024, 10),
+                new Cap("RedBull", "dark blue", 2024, 10),
+                new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 5),
+                new TShirt("Ferrari", "red", 2024, 40, "normal", "M", 2),
+                new TShirt("Mercedes", "black", 2024, 34, "fit", "F", 5),
+                new TShirt("Mercedes", "black", 2024, 38, "fit", "F", 3),
+                new TShirt("Mercedes", "black", 2024, 42, "fit", "M", 5),
+                new TShirt("McLaren", "orange", 2024, 36, "normal", "M", 5),
+                new TShirt("McLaren", "orange", 2024, 40, "normal", "M", 7)
+        ));
         items.forEach(f1MerchStore::addItemToStore);
 
         f1MerchStore.purchaseItemFromMerchStore(DianaMegelea, new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 1));
@@ -105,28 +124,5 @@ public class Main {
             }
             System.out.println();
         }
-
-
-        F1TicketStore.threadPool.shutdown();
-    }
-
-    private static List<Item> addItems() {
-        List<Item> items = new ArrayList<>();
-
-        items.add(new Cap("Ferrari", "red", 2024, 10));
-        items.add(new Cap("Mercedes", "black", 2024, 1));
-        items.add(new Cap("McLaren", "orange", 2024, 10));
-        items.add(new Cap("RedBull", "dark blue", 2024, 10));
-
-        items.add(new TShirt("Ferrari", "red", 2024, 34, "normal", "F", 5));
-        items.add(new TShirt("Ferrari", "red", 2024, 40, "normal", "M", 2));
-        items.add(new TShirt("Mercedes", "black", 2024, 34, "fit", "F", 5));
-        items.add(new TShirt("Mercedes", "black", 2024, 38, "fit", "F", 3));
-        items.add(new TShirt("Mercedes", "black", 2024, 42, "fit", "M", 5));
-        items.add(new TShirt("McLaren", "orange", 2024, 36, "normal", "M", 5));
-        items.add(new TShirt("McLaren", "orange", 2024, 40, "normal", "M", 7));
-
-
-        return items;
     }
 }

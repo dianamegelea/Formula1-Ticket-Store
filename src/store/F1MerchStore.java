@@ -6,30 +6,23 @@ import domain.Item;
 import domain.ItemPurchaseVisitor;
 import domain.ItemVisitor;
 import exceptions.ItemNotAvailable;
+import request.PurchaseItemRequest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.ReadWriteLock;
-
-import static store.F1TicketStore.threadPool;
 
 public class F1MerchStore {
     private List<Item> items;
-    private static F1MerchStore instance;
-    private final Object purchaseLock = new Object();
+    private ExecutorService threadPool;
 
-    private F1MerchStore() {
-        items = new ArrayList<>();
-    }
-
-    public static synchronized F1MerchStore getInstance() {
-        if (instance == null) {
-            instance = new F1MerchStore();
-        }
-        return instance;
+    public F1MerchStore(ExecutorService threadPool) {
+        items = Collections.synchronizedList(new ArrayList<>());
+        this.threadPool = threadPool;
     }
 
     public void addItemToStore(Item item) {
@@ -41,13 +34,7 @@ public class F1MerchStore {
     }
 
     public void purchaseItemFromMerchStore(Customer customer, Item item) {
-        Future<?> future = threadPool.submit(() -> {
-            try {
-                purchaseItem(customer, item);
-            } catch (ItemNotAvailable e) {
-                throw new RuntimeException(e);
-            }
-        });
+        Future<?> future = threadPool.submit(new PurchaseItemRequest(items, customer, item));
 
         try {
             future.get();
@@ -55,21 +42,4 @@ public class F1MerchStore {
             e.printStackTrace();
         }
     }
-
-    private void purchaseItem(Customer customer, Item item)
-            throws ItemNotAvailable {
-        Optional<Item> it = items.stream()
-                .filter(item1 -> item1.equals(item)).findFirst();
-        if (it.isPresent()) {
-            synchronized (purchaseLock) {
-                Item existingItem = it.get();
-
-                ItemVisitor visitor = new ItemPurchaseVisitor();
-                item.accept(visitor, customer, existingItem);
-            }
-        } else {
-            throw new ItemNotAvailable("We don't have that item in our store");
-        }
-    }
-
 }

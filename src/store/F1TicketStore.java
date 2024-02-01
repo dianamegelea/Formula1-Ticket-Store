@@ -2,8 +2,11 @@ package store;
 
 import domain.*;
 import exceptions.ClientExistsException;
+import request.PurchaseTicketRequest;
+import request.RegisterCustomerRequest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -15,22 +18,12 @@ public class F1TicketStore {
     private List<F1Race> races;
     private List<Customer> customers;
     private F1MerchStore merchStore;
+    private ExecutorService threadPool;
 
-    private static F1TicketStore instance;
-    private final Object purchaseLock = new Object();
-    public static final ExecutorService threadPool =
-            Executors.newFixedThreadPool(8);
-
-    private F1TicketStore() {
-        races = new ArrayList<>();
-        customers = new ArrayList<>();
-    }
-
-    public static synchronized F1TicketStore getInstance() {
-        if (instance == null) {
-            instance = new F1TicketStore();
-        }
-        return instance;
+    public F1TicketStore() {
+        races = Collections.synchronizedList(new ArrayList<>());
+        customers = Collections.synchronizedList(new ArrayList<>());
+        threadPool = Executors.newFixedThreadPool(8);
     }
 
     public List<F1Race> getRaces() {
@@ -45,10 +38,6 @@ public class F1TicketStore {
         return customers;
     }
 
-    public void setCustomers(List<Customer> customers) {
-        this.customers = customers;
-    }
-
     public F1MerchStore getMerchStore() {
         return merchStore;
     }
@@ -57,28 +46,18 @@ public class F1TicketStore {
         this.merchStore = merchStore;
     }
 
+    public ExecutorService getThreadPool() {
+        return threadPool;
+    }
+
     public void addCustomer(Customer customer) {
-        Future<?> future = threadPool.submit(() -> {
-            try {
-                registerCustomer(customer);
-            } catch (ClientExistsException e) {
-                e.printStackTrace();
-            }
-        });
+        Future<?> future = threadPool.submit(new RegisterCustomerRequest(customers, customer));
 
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-    }
-
-    private void registerCustomer(Customer newCustomer)
-            throws ClientExistsException {
-        if (customers.contains(newCustomer)) {
-            throw new ClientExistsException(newCustomer.getName());
-        }
-        customers.add(newCustomer);
     }
 
     public void addRaceToCalendar(F1Race race) {
@@ -92,23 +71,12 @@ public class F1TicketStore {
     }
 
     public void purchaseTicket(Customer customer, F1Race race, Seat seat) {
-        Future<?> future = threadPool.submit(() ->
-                buyTicket(customer, race, seat));
+        Future<?> future = threadPool.submit(new PurchaseTicketRequest(customer, race, seat));
+
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void buyTicket(Customer customer, F1Race race, Seat seat) {
-        if (race.getSeats().contains(seat) && seat.isAvailable()) {
-            synchronized (purchaseLock) {
-                Ticket ticket = new Ticket(race.getRaceName(), seat);
-                customer.getPurchasedTickets().add(ticket);
-                seat.setAvailable(false);
-                race.incrementSoldTickets();
-            }
         }
     }
 }

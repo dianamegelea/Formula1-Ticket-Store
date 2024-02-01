@@ -1,21 +1,12 @@
 package domain;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class Ticket {
-    private static final AtomicInteger ticketsCounter = new AtomicInteger(0);
-    private int ticketId;
     private String raceName;
     private Seat seat;
 
     public Ticket(String raceName, Seat seat) {
-        this.ticketId = ticketsCounter.getAndIncrement();
         this.raceName = raceName;
         this.seat = seat;
-    }
-
-    public int getTicketId() {
-        return ticketId;
     }
 
     public String getRaceName() {

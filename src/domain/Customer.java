@@ -2,18 +2,14 @@ package domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Customer {
-    private static final AtomicInteger customersCounter = new AtomicInteger(0);
-    private int customerId;
     private String name;
     private String email;
     private List<Ticket> purchasedTickets;
     private List<Item> purchasedMerch;
 
     public Customer(String name, String email) {
-        this.customerId = customersCounter.getAndIncrement();
         this.name = name;
         this.email = email;
         this.purchasedTickets = new ArrayList<>();
@@ -28,10 +24,6 @@ public class Customer {
         return purchasedMerch;
     }
 
-    public int getCustomerId() {
-        return customerId;
-    }
-
     public String getName() {
         return name;
     }
@@ -39,8 +31,8 @@ public class Customer {
     @Override
     public String toString() {
         return "Customer{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
+                "name=" + name +
+                ", email=" + email +
                 ", purchasedTickets=" + purchasedTickets +
                 ", purchasedMerch=" + purchasedMerch +
                 '}';
